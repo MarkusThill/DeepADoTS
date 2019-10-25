@@ -90,12 +90,12 @@ class LSTMAD(Algorithm, PyTorchUtils):
         return input_data, target_data
 
     def _calc_errors(self, predictions, target_data, return_stacked_predictions=False):
-        errors = [predictions.data.numpy()[:, self.len_out - 1:-self.len_in, :, 0]]
+        errors = [predictions.data.cpu().numpy()[:, self.len_out - 1:-self.len_in, :, 0]]
         for l in range(1, self.len_out):
-            errors += [predictions.data.numpy()[:, self.len_out - 1 - l:-self.len_in-l, :, l]]
+            errors += [predictions.data.cpu().numpy()[:, self.len_out - 1 - l:-self.len_in-l, :, l]]
         errors = np.stack(errors, axis=3)
         stacked_predictions = errors
-        errors = target_data.data.numpy()[..., np.newaxis] - errors
+        errors = target_data.data.cpu().numpy()[..., np.newaxis] - errors
         return errors if return_stacked_predictions is False else (errors, stacked_predictions)
 
     def _build_model(self, d, batch_size):

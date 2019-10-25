@@ -90,8 +90,8 @@ class LSTMED(Algorithm, PyTorchUtils):
             score = -mvnormal.logpdf(error.view(-1, X.shape[1]).data.cpu().numpy())
             scores.append(score.reshape(ts.size(0), self.sequence_length))
             if self.details:
-                outputs.append(output.data.numpy())
-                errors.append(error.data.numpy())
+                outputs.append(output.data.cpu().numpy())
+                errors.append(error.data.cpu().numpy())
 
         # stores seq_len-many scores per timestamp and averages them
         scores = np.concatenate(scores)
