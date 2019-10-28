@@ -123,13 +123,13 @@ class DAGMM(Algorithm, PyTorchUtils):
             enc, dec, z, gamma = self.dagmm(self.to_var(sequence).float())
             sample_energy, _ = self.dagmm.compute_energy(z, size_average=False)
             idx = (i % self.sequence_length, np.arange(i, i + self.sequence_length))
-            test_energy[idx] = sample_energy.data.numpy()
+            test_energy[idx] = sample_energy.data.cpu().numpy()
 
             if self.details:
-                encodings[idx] = enc.data.numpy()
-                decodings[idx] = dec.data.numpy()
-                euc_errors[idx] = z[:, 1].data.numpy()
-                csn_errors[idx] = z[:, 2].data.numpy()
+                encodings[idx] = enc.data.cpu().numpy()
+                decodings[idx] = dec.data.cpu().numpy()
+                euc_errors[idx] = z[:, 1].data.cpu().numpy()
+                csn_errors[idx] = z[:, 2].data.cpu().numpy()
 
         test_energy = np.nanmean(test_energy, axis=0)
 
@@ -228,7 +228,7 @@ class DAGMMModule(nn.Module, PyTorchUtils):
         for i in range(k):
             # K x D x D
             cov_k = cov[i] + self.to_var(torch.eye(d) * eps)
-            pinv = np.linalg.pinv(cov_k.data.numpy())
+            pinv = np.linalg.pinv(cov_k.data.cpu().numpy())
             cov_inverse.append(Variable(torch.from_numpy(pinv)).unsqueeze(0))
 
             eigvals = np.linalg.eigvals(cov_k.data.cpu().numpy() * (2 * np.pi))
